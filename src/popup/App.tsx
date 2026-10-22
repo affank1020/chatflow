@@ -109,7 +109,6 @@ export default function App() {
         <div className="brand-icon">↗</div>
         <div>
           <h1>ChatFlow <span>0.2</span></h1>
-          <p>Less admin. More shipping.</p>
         </div>
         <span className="local-chip">LOCAL</span>
       </header>

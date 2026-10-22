@@ -11,8 +11,8 @@ if (!globalFlag.__chatflowGitHubInstalled) {
     button.setAttribute('aria-label', 'Review pull request ' + initial.number + ' in ChatFlow');
     Object.assign(button.style, {
       position: 'fixed', bottom: '24px', right: '24px', zIndex: '2147483645',
-      background: '#202f4d', color: '#fff', padding: '10px 16px',
-      borderRadius: '999px', border: '1px solid #5f759a',
+      background: '#f6f9ff', color: '#284b83', padding: '10px 16px',
+      colorScheme: 'light', borderRadius: '999px', border: '1px solid #cbd9ed',
       boxShadow: '0 5px 24px #0002', cursor: 'pointer', font: '600 12px system-ui',
     });
     button.addEventListener('click', async () => {

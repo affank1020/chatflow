@@ -46,8 +46,9 @@ if (!globalFlag.__chatflowChatInstalled) {
       Object.assign(notice.style, {
         position: 'fixed', right: '24px', bottom: '162px', zIndex: '2147483646',
         maxWidth: '350px', borderRadius: '10px', padding: '11px 14px',
-        background: '#172741', color: '#fff', font: '12px system-ui',
-        boxShadow: '0 8px 24px #0003',
+        background: '#ffffff', color: '#29384e', font: '12px system-ui',
+        colorScheme: 'light', border: '1px solid #d9e3f1',
+        boxShadow: '0 8px 24px #0002',
       });
       document.body.append(notice);
     }
@@ -95,8 +96,8 @@ if (!globalFlag.__chatflowChatInstalled) {
     el.type = 'button';
     el.textContent = label;
     Object.assign(el.style, {
-      background: '#202f4d', color: '#fff', padding: '10px 14px',
-      borderRadius: '999px', border: '1px solid #5f759a',
+      background: '#f6f9ff', color: '#284b83', padding: '10px 14px',
+      colorScheme: 'light', borderRadius: '999px', border: '1px solid #cbd9ed',
       boxShadow: '0 5px 24px #0002', cursor: 'pointer', font: '600 12px system-ui',
     });
     el.addEventListener('click', () => { void Promise.resolve(handler()).catch(error => showNotice(String(error))); });
