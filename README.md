@@ -38,6 +38,9 @@ This creates an isolated temporary copy, tests Vite, esbuild and static asset wa
 
 ## Features
 
+- **Dark-only interface** in the extension popup, ChatGPT launcher and GitHub shortcut.
+- **Inline ChatFlow launcher** anchored just above ChatGPT's composer, using the same form-relative positioning approach as EcoPrompt's Optimise button. It moves aside when EcoPrompt is visible.
+- Compact, context-sensitive menu for new reviews, re-reviews, sending findings back to the dev conversation, and manually entering a PR URL when ChatGPT has no PR link.
 - Detect canonical GitHub PR URLs from GitHub PR pages or ChatGPT conversation links.
 - **New review** opens a new ChatGPT conversation with the PR review prompt prepared.
 - **Re-review** opens the linked reviewer conversation and inserts a latest-commit re-review prompt.
@@ -48,6 +51,8 @@ This creates an isolated temporary copy, tests Vite, esbuild and static asset wa
 - Recent PR list and manual URL fallback in the React popup.
 
 ## Important limitation
+
+The ChatGPT launcher is attached to the current composer position using DOM selectors and layout measurements (not a supported ChatGPT plugin API). ChatGPT UI changes can affect placement; if it disappears, reload the extension and refresh the ChatGPT tab.
 
 Writing `@Code Reviewer` in a pre-filled message does **not** guarantee that ChatGPT selects the actual Code Reviewer plugin. Choose it through ChatGPT's plugin/mention picker before submitting. ChatGPT's `?q=` URL prefill and composer DOM are unofficial UI integrations and can change; the popup also provides a **Copy review prompt** fallback. This version deliberately does not click buttons within ChatGPT or auto-submit.
 
