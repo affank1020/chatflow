@@ -15,7 +15,26 @@ npm run check
 
 Open `chrome://extensions`, enable **Developer mode**, click **Load unpacked**, and select the **dist/** directory (not the repository root). If you installed the earlier v0.1 extension from the repository root, remove that unpacked entry first, then load `dist/`. Keep the repository folder in a permanent location.
 
-To make changes: edit `src/`, run `npm run build`, click **Reload** on the extension card, then refresh open ChatGPT/GitHub tabs. The background service worker is bundled as an ES module, while content scripts are self-contained classic scripts.
+## Local development — watch mode
+
+Run this once in a terminal and leave it running while editing:
+
+```bash
+npm run watch
+# npm run dev also works
+```
+
+The watcher **automatically rebuilds `dist/`** when you change React/TS/CSS sources, background and content scripts, or static files in `public/`. No need to rerun `npm run build` on every edit. Stable Vite output filenames avoid accumulating old hashed assets; it does not clear esbuild output while watching.
+
+**Chrome does not automatically reload unpacked extensions.** After edits, click **Reload** on ChatFlow in `chrome://extensions`, then refresh any open ChatGPT/GitHub tabs affected by content-script changes. If you change `vite.config.ts` or build scripts, restart `npm run watch` (Ctrl+C, then run it again). Use `npm run build` for a clean one-off production build.
+
+For a focused verification of live rebuild behaviour:
+
+```bash
+npm run watch:smoke
+```
+
+This creates an isolated temporary copy, tests Vite, esbuild and static asset watch updates, and cleans up afterwards.
 
 ## Features
 
@@ -42,7 +61,8 @@ Writing `@Code Reviewer` in a pre-filled message does **not** guarantee that Cha
 | GitHub | `src/content-github.ts` | PR-page shortcut |
 | Shared | `src/shared/workflow.ts` | URL validation, prompts and workflow types |
 | Tests | `tests/*` | Workflow unit tests |
-| Build | `scripts/build.mjs` | Vite popup bundle; esbuild worker and isolated content scripts |
+| Build | `scripts/build.mjs` | One-shot Vite/esbuild build |
+| Watch | `scripts/watch.mjs` | Live Vite/esbuild rebuilding and public asset mirroring |
 
 Local Chrome storage key `chatflowStateV1` is unchanged from v0.1, preserving existing PR → developer/reviewer chat associations when updating the same installed extension. If you remove the old extension and re-add `dist/`, Chrome may assign a different extension ID and its storage will not automatically transfer. Keep the old extension enabled until you have copied any important links, or re-link them from your chats.
 
@@ -54,11 +74,12 @@ No ChatGPT credentials, GitHub tokens, external services, telemetry, or backend 
 npm run typecheck
 npm test
 npm run build
-# or all at once:
+npm run watch:smoke
+# or production checks together:
 npm run check
 ```
 
-The compiled extension is in `dist/` and is not committed. GitHub Actions runs these checks on updates.
+The compiled extension is in `dist/` and is not committed. GitHub Actions validates production and live watch builds.
 
 ## Roadmap
 

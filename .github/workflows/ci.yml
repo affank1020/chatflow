@@ -14,6 +14,8 @@ jobs:
           node-version: '22'
       - run: npm install --no-audit --no-fund
       - run: npm run check
+      - name: Smoke-test live watch rebuilds
+        run: npm run watch:smoke
       - name: Verify Manifest V3 output
         run: |
           test -f dist/manifest.json
