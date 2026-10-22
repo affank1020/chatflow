@@ -1,63 +1,68 @@
-# ChatFlow — PR review handoff helper (v0.1)
+# ChatFlow
 
-A small, *local-only*, unpacked Chrome extension. Designed for the Atlas + Benchmark workflow, but works with any GitHub PR.
+A local-first Chrome extension that makes ChatGPT↔GitHub pull-request handoffs less manual. Built with **React 19, TypeScript, Redux Toolkit, Vite and esbuild**, targeting Chrome Manifest V3.
 
-## What already works
+## Install / run (macOS or Linux)
 
-- Detect GitHub pull request URLs in the current GitHub page or ChatGPT conversation.
-- Click **Review #N** in ChatGPT or **Review in ChatFlow** on a GitHub PR; opens a **new** ChatGPT chat with the PR review prompt prefilled.
-- After starting the new chat and sending a message, ChatFlow records the generated ChatGPT conversation URL as the review chat.
-- Remember the developer chat when the review is started from that chat.
-- **Re-review** inserts the latest-commit review request into an **empty** composer of the current ChatGPT chat; never silently overwrites a draft or submits.
-- **Back to dev** and **Open review chat** shortcuts; they reuse already-open tabs when possible.
-- Toolbar popup has manual URL fallback, prompt copy fallback, and a link to associate the current dev chat.
-- Right-click GitHub PR links or PR pages to choose **Review this PR with ChatFlow** (where supported).
+Requirements: Node.js **20.19+ or 22.12+** and npm.
 
-## Important limitation: actual Code Reviewer plugin selection
-
-`@Code Reviewer` in a URL-prefilled message is **plain text**, not necessarily a selected ChatGPT plugin. Before submitting, choose Code Reviewer from the ChatGPT @ mention menu or the Plugins picker. This MVP intentionally avoids unreliable hidden React state hacks or blind auto-send. This is the largest remaining step before full one-click reviews.
-
-The `?q=` ChatGPT prefill is a convenience, not a documented stable API. If ChatGPT changes its routing, **Copy review prompt** is the fallback. Likewise, inline ChatGPT composer selectors may break after UI updates.
-
-## Install on macOS
-
-1. Save/extract this folder to `~/Documents/GitRepos/chatflow` (or any permanent folder).
-2. Visit `chrome://extensions` in Chrome and enable **Developer mode**.
-3. Choose **Load unpacked** and select the **chatflow** folder containing `manifest.json`.
-4. Pin ChatFlow to the Chrome toolbar and refresh open ChatGPT/GitHub tabs.
-5. Open a ChatGPT developer chat containing a GitHub PR link. You should see a floating **Review #N** shortcut; the popup also detects it.
-
-No build step, npm install, account login, API key, local server, or backend is needed. If you edit source, use **Reload** on `chrome://extensions` and refresh ChatGPT.
-
-## Developer checks
-
-Requires Node.js 20+ for tests:
-
-```sh
-npm test
+```bash
+git clone https://github.com/affank1020/chatflow.git
+cd chatflow
+npm install
 npm run check
 ```
 
+Open `chrome://extensions`, enable **Developer mode**, click **Load unpacked**, and select the **dist/** directory (not the repository root). If you installed the earlier v0.1 extension from the repository root, remove that unpacked entry first, then load `dist/`. Keep the repository folder in a permanent location.
+
+To make changes: edit `src/`, run `npm run build`, click **Reload** on the extension card, then refresh open ChatGPT/GitHub tabs. The background service worker is bundled as an ES module, while content scripts are self-contained classic scripts.
+
+## Features
+
+- Detect canonical GitHub PR URLs from GitHub PR pages or ChatGPT conversation links.
+- **New review** opens a new ChatGPT conversation with the PR review prompt prepared.
+- **Re-review** opens the linked reviewer conversation and inserts a latest-commit re-review prompt.
+- **Prepare fixes in dev** opens the linked developer conversation and inserts an instruction to inspect current GitHub findings and fix actionable issues.
+- Both draft insertion actions **refuse to overwrite existing drafts** and **never automatically send messages**.
+- Navigate between linked developer and reviewer conversations, reusing open browser tabs.
+- Review button on GitHub PR pages and context-sensitive actions inside ChatGPT.
+- Recent PR list and manual URL fallback in the React popup.
+
+## Important limitation
+
+Writing `@Code Reviewer` in a pre-filled message does **not** guarantee that ChatGPT selects the actual Code Reviewer plugin. Choose it through ChatGPT's plugin/mention picker before submitting. ChatGPT's `?q=` URL prefill and composer DOM are unofficial UI integrations and can change; the popup also provides a **Copy review prompt** fallback. This version deliberately does not click buttons within ChatGPT or auto-submit.
+
 ## Architecture
 
-- `manifest.json` — MV3 permissions and site-specific content scripts.
-- `background.js` — Chrome tab, context menu, storage, and conversation-link coordination.
-- `lib/workflow.mjs` — independently testable URL and prompt utilities.
-- `content-chatgpt.js` — lightweight context button, PR link detection, safe re-review draft insertion.
-- `content-github.js` — GitHub PR action button.
-- `popup.html/css/js` — toolbar UI.
-- `tests/` — pure module tests.
+| Area | Source | Responsibility |
+| --- | --- | --- |
+| Popup | `src/popup/*` | React UI, Redux Toolkit state and actions |
+| Service worker | `src/background.ts` | Tabs, context menu, serialized storage writes, linked-chat draft prep |
+| ChatGPT | `src/content-chatgpt.ts` | Detect PR context, contextual buttons, safe prompt insertion |
+| GitHub | `src/content-github.ts` | PR-page shortcut |
+| Shared | `src/shared/workflow.ts` | URL validation, prompts and workflow types |
+| Tests | `tests/*` | Workflow unit tests |
+| Build | `scripts/build.mjs` | Vite popup bundle; esbuild worker and isolated content scripts |
 
-Everything is stored only in Chrome's `storage.local`: canonical PR URLs and matching ChatGPT conversation URLs. No external extension backend and no GitHub token. The browser naturally loads the pages you explicitly open.
+Local Chrome storage key `chatflowStateV1` is unchanged from v0.1, preserving existing PR → developer/reviewer chat associations when updating the same installed extension. If you remove the old extension and re-add `dist/`, Chrome may assign a different extension ID and its storage will not automatically transfer. Keep the old extension enabled until you have copied any important links, or re-link them from your chats.
 
-## Deliberately left out of v0.1
+No ChatGPT credentials, GitHub tokens, external services, telemetry, or backend are required. Permissions are limited to storage, tabs, context menus, ChatGPT and GitHub.
 
-- Guaranteed activation of the Code Reviewer plugin / automatic message sending.
-- Automatically identifying the most relevant PR in a long multi-PR conversation.
-- Synchronising state across browsers/devices.
-- Automatic PR-comment ingestion, completion notifications or continuous background monitoring.
-- Backend, account system, repository and PR dashboards.
+## Development
 
-## Next iteration ideas
+```bash
+npm run typecheck
+npm test
+npm run build
+# or all at once:
+npm run check
+```
 
-Prioritize reliable Code Reviewer activation, contextual detection of newly posted PRs without scanning whole chats, and capturing a reviewer verdict that can be shown with low-noise badges (no manual tagging). Consider a React + TypeScript/Vite popup after interaction patterns stabilize; for v0.1 the dependency-free structure makes loading and debugging faster.
+The compiled extension is in `dist/` and is not committed. GitHub Actions runs these checks on updates.
+
+## Roadmap
+
+1. Verify ChatGPT plugin selection flow in the live UI and reduce remaining manual selection where feasible.
+2. Improve PR context detection in long, multi-PR chats without capturing message content.
+3. Add lightweight per-PR status from GitHub, without creating a parallel task board.
+4. Test optional cross-browser support once the Chrome workflow feels solid.

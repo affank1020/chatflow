@@ -1,0 +1,29 @@
+name: Validate extension
+on:
+  push:
+  pull_request:
+permissions:
+  contents: read
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: npm install --no-audit --no-fund
+      - run: npm run check
+      - name: Verify Manifest V3 output
+        run: |
+          test -f dist/manifest.json
+          test -f dist/background.js
+          test -f dist/content-chatgpt.js
+          test -f dist/content-github.js
+          test -f dist/popup.html
+      - name: Package unpacked extension
+        uses: actions/upload-artifact@v4
+        with:
+          name: chatflow-extension
+          path: dist/
+          if-no-files-found: error
