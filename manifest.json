@@ -1,0 +1,22 @@
+{
+  "manifest_version": 3,
+  "name": "ChatFlow — PR Review Helper",
+  "version": "0.1.0",
+  "description": "Fast ChatGPT/GitHub PR review handoffs with local conversation links.",
+  "permissions": ["storage", "tabs", "contextMenus"],
+  "host_permissions": ["https://chatgpt.com/*", "https://github.com/*"],
+  "background": { "service_worker": "background.js", "type": "module" },
+  "action": { "default_title": "ChatFlow", "default_popup": "popup.html" },
+  "content_scripts": [
+    {
+      "matches": ["https://chatgpt.com/*"],
+      "js": ["content-chatgpt.js"],
+      "run_at": "document_idle"
+    },
+    {
+      "matches": ["https://github.com/*/pull/*"],
+      "js": ["content-github.js"],
+      "run_at": "document_idle"
+    }
+  ]
+}

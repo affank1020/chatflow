@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>ChatFlow</title>
+  <link rel="stylesheet" href="popup.css" />
+</head>
+<body>
+  <main>
+    <header class="header">
+      <div class="logo">↗</div>
+      <div><h1>ChatFlow <span class="version">v0.1</span></h1><p>PR review shortcuts</p></div>
+      <span class="local">LOCAL</span>
+    </header>
+    <section class="content">
+      <div class="labelrow"><label for="pr-url">Pull request</label><span id="source-label">No PR detected</span></div>
+      <input id="pr-url" type="url" placeholder="https://github.com/owner/repo/pull/123" spellcheck="false" autocomplete="off" />
+      <p id="pr-caption" class="caption">Paste a PR URL, or open a GitHub PR / ChatGPT development chat.</p>
+      <div class="primary-actions">
+        <button id="review" class="primary"><span>↗</span> New review chat</button>
+        <button id="rereview" class="secondary"><span>↻</span> Re-review here</button>
+      </div>
+      <div class="divider"></div>
+      <h2>Conversation links <small>saved automatically</small></h2>
+      <div class="links">
+        <button id="dev" class="link-row"><span class="dot dev"></span> Back to dev chat <span class="chevron">↗</span></button>
+        <button id="review-chat" class="link-row"><span class="dot review"></span> Open review chat <span class="chevron">↗</span></button>
+        <button id="link-dev" class="link-row subtle"><span>＋</span> Associate this as dev chat</button>
+      </div>
+      <div class="divider"></div>
+      <button id="copy" class="copy">Copy review prompt <span>⧉</span></button>
+      <p id="status" class="status" role="status" aria-live="polite"></p>
+    </section>
+    <footer>Prompts stay on your device · @Code Reviewer must be selected in ChatGPT</footer>
+  </main>
+  <script type="module" src="popup.js"></script>
+</body>
+</html>
